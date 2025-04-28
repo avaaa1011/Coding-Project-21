@@ -1,87 +1,68 @@
-import { useState, useEffect } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0);
+import React, { useState, useEffect } from "react";
+import Gallery from "./components/Gallery";
+import "./App.css"; // Import CSS for styling
+
+const App = () => {
   const [tours, setTours] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchTours = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch('https://course-api.com/react-tours-project');
-        if (!response.ok) {
-          throw new Error('Failed to fetch tours');
-        }
-        const data = await response.json();
-        setTours(data);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  // Function to fetch tours from the API
+  const fetchTours = async () => {
+    setLoading(true); // Set loading to true before fetching
+    try {
+      const response = await fetch("https://api.allorigins.win/raw?url=https://course-api.com/react-tours-project");
+      if (!response.ok) {
+        throw new Error("Failed to fetch tours"); // Throw an error if the response is not OK
       }
-    };
+      const data = await response.json(); 
+      setTours(data); 
+      setError(null); // Clear any previous errors
+    } catch (err) {
+      setError(err.message); // Set the error message if an error occurs
+    } finally {
+      setLoading(false); // Set loading to false after fetching
+    }
+  };
 
+  // useEffect to fetch tours when the component mounts
+  useEffect(() => {
     fetchTours();
   }, []);
 
+  // Function to remove a tour by its ID
+  const removeTour = (id) => {
+    setTours(tours.filter((tour) => tour.id !== id)); // Filter out the tour with the given ID
+  };
+
+  // Render a loading message if data is still being fetched
   if (loading) {
     return <h2>Loading...</h2>;
   }
 
+  // Render an error message if an error occurred during fetching
   if (error) {
     return <h2>Error: {error}</h2>;
   }
 
-  return (
-    <>
-      {/* Logo section with links to Vite and React documentation */}
+  // Render a message and a refresh button if no tours are left
+  if (tours.length === 0) {
+    return (
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h2>No Tours Left</h2>
+        <button onClick={fetchTours}>Refresh</button> {/* Refetch tours when the button is clicked */}
       </div>
+    );
+  }
 
-      {/* Main heading */}
-      <h1>Vite + React</h1>
-
-      {/* Card section with a button to increment count */}
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count} {/* Display current count */}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR {/* Hot Module Replacement */}
-        </p>
-      </div>
-
-      {/* Gallery section */}
-      <div className="gallery">
-        <h2>Tour Gallery</h2>
-        {tours.map((tour) => (
-          <div key={tour.id} className="tour-card">
-            <h3>{tour.name}</h3>
-            <p>{tour.info}</p>
-            <p>Price: ${tour.price}</p>
-            <img src={tour.image} alt={tour.name} />
-          </div>
-        ))}
-      </div>
-
-      {/* Footer section with documentation links */}
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+  // Render the Gallery component with the tours data and removeTour function
+  return (
+    <div>
+      <h1>Tours</h1>
+      <Gallery tours={tours} onRemoveTour={removeTour} />
+    </div>
   );
-}
+};
 
 export default App;
