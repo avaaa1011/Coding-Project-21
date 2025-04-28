@@ -1,42 +1,42 @@
-import { useState, useEffect } from 'react' 
-import reactLogo from './assets/react.svg' 
-import viteLogo from '/vite.svg' 
-import './App.css' 
+import { useState, useEffect } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
 
 function App() {
-  //manages the count for the button
   const [count, setCount] = useState(0);
-
-  // stores the fetched tours data
   const [tours, setTours] = useState([]);
-
-  //manages the loading state while fetching data
   const [loading, setLoading] = useState(true);
-
-  // stores any error that occurs during the fetch
   const [error, setError] = useState(null);
 
-  // useEffect to fetch tours data when the component mounts
   useEffect(() => {
     const fetchTours = async () => {
-      setLoading(true); // Set loading to true before starting the fetch
+      setLoading(true);
       try {
-        const response = await fetch('https://course-api.com/react-tours-project'); // Fetch data from API
+        const response = await fetch('https://course-api.com/react-tours-project');
         if (!response.ok) {
-          throw new Error('Failed to fetch tours'); // Throw error if response is not OK
+          throw new Error('Failed to fetch tours');
         }
-        const data = await response.json(); // Parse JSON data
-        setTours(data); // Update tours state with fetched data
-        setError(null); // Clear any previous errors
+        const data = await response.json();
+        setTours(data);
+        setError(null);
       } catch (err) {
-        setError(err.message); // Set error state if fetch fails
+        setError(err.message);
       } finally {
-        setLoading(false); // Set loading to false after fetch completes
+        setLoading(false);
       }
     };
 
-    fetchTours(); // Call the fetch function
-  }, []); // Empty dependency array ensures this runs only once on mount
+    fetchTours();
+  }, []);
+
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
+
+  if (error) {
+    return <h2>Error: {error}</h2>;
+  }
 
   return (
     <>
@@ -63,12 +63,25 @@ function App() {
         </p>
       </div>
 
+      {/* Gallery section */}
+      <div className="gallery">
+        <h2>Tour Gallery</h2>
+        {tours.map((tour) => (
+          <div key={tour.id} className="tour-card">
+            <h3>{tour.name}</h3>
+            <p>{tour.info}</p>
+            <p>Price: ${tour.price}</p>
+            <img src={tour.image} alt={tour.name} />
+          </div>
+        ))}
+      </div>
+
       {/* Footer section with documentation links */}
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App // Export the App component as default
+export default App;
